@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block blog %}
+
+<form method="post" >
+    <div class="form-group">
+        {{form.title.label}}
+        {{form.title(class="form-control")}}
+    </div>
+    <div class="form-group">
+        {{form.body.label}}
+        {{form.body(class="form-control", rows="6", placeholder="Text input")}}
+        <!--<script id="editor" type="text/plain"></script>-->
+    </div>
+
+    <div class="form-group">{{ form.submit(class="btn btn-primary") }}</div>
+    {{form.csrf_token}}
+</form>
+<!--{{ wtf.quick_form(form) }}-->
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}
