@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block blog %}
+<form method="post">
+    {{form.username}}
+    {{form.password}}
+    {{form.remember_me}}{{form.remember_me.label}}
+    {{form.submit}}
+    {{form.csrf_token}}
+</form>
+{% endblock %}

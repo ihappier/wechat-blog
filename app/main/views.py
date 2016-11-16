@@ -9,7 +9,7 @@ from app.ueditor.uploader import Uploader
 from . import main
 from .. import db
 from ..models import User, Post
-from .forms import PostForm
+from .forms import PostForm, LoginForm
 
 import json
 import os
@@ -55,9 +55,10 @@ def about():
 
 @main.route('/post', methods=["GET", "POST"])
 def post():
+    """发布新文章页面"""
     form = PostForm()
     if form.validate_on_submit():
-        body = request.form.get("body")
+        body = request.form.get("editorValue")
         article = Post(title=request.form.get("title"), body=body)
         db.session.add(article)
         db.session.commit()
@@ -67,21 +68,30 @@ def post():
 
 @main.route('/article/<int:id>')
 def article(id):
+    """文章页面"""
     article = Post.query.get_or_404(id)
     return render_template('article.html', article=article, title=article.title)
 
 
 @main.route('/edit/<int:id>', methods=["GET", "POST"])
 def edit(id):
+    """修改文章页面"""
     form = PostForm()
     edit_post = Post.query.get_or_404(id)
     if form.validate_on_submit():
-        body = request.form.get("body")
-        edit_post = Post(title=request.form.get("title"), body=body)
+        edit_post.title = request.form.get('title')
+        edit_post.body = request.form.get('editorValue')
         db.session.add(edit_post)
         db.session.commit()
         return redirect(url_for('main.article', id=id))
-    return render_template('edit.html',form=form, post=edit_post)
+    return render_template('edit.html', form=form, post=edit_post)
+
+
+@main.route('/login', methods=["GET", "POST"])
+def login():
+    form = LoginForm()
+    return render_template('login.html', form=form)
+
 
 @main.route('/upload/', methods=['GET', 'POST', 'OPTIONS'])
 def upload():

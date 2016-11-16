@@ -2,11 +2,7 @@
 {% block blog %}
 <div class="container">
     <h1>{{title}}</h1>
-    {% if article.body_html %}
-        {{ article.body_html | safe }}
-    {% else %}
-        <p>{{article.body}}</p>
-    {% endif %}
+        <p>{{article.body|safe}}</p>
     <a href={{url_for('main.edit', id=article.id)}}>编辑文章</a>
 </div>
 {% endblock%}}
