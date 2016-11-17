@@ -1,17 +1,23 @@
 from datetime import datetime
 from . import db, Login_manager
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 from markdown import markdown
 import bleach
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, index=True)
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    post = db.relationship('Post', backref='author', lazy='dynamic')
+    # role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    @Login_manager.user_loader
+    def get_user(ident):
+        return User.query.get(int(ident))
 
     @property
     def password(self):
@@ -40,6 +46,8 @@ class Post(db.Model):
     body = db.Column(db.Text)
     body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
 
 #     @staticmethod
 #     def on_changed_body(target, value, oldvalue, initiator):

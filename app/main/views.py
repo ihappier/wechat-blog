@@ -5,6 +5,7 @@ Routes and views for the flask application.
 from datetime import datetime
 from flask import render_template, redirect, url_for, request, make_response, current_app
 from app.ueditor.uploader import Uploader
+from flask_login import login_required
 
 from . import main
 from .. import db
@@ -54,6 +55,7 @@ def about():
 
 
 @main.route('/post', methods=["GET", "POST"])
+@login_required
 def post():
     """发布新文章页面"""
     form = PostForm()
@@ -74,6 +76,7 @@ def article(id):
 
 
 @main.route('/edit/<int:id>', methods=["GET", "POST"])
+@login_required
 def edit(id):
     """修改文章页面"""
     form = PostForm()
@@ -85,12 +88,6 @@ def edit(id):
         db.session.commit()
         return redirect(url_for('main.article', id=id))
     return render_template('edit.html', form=form, post=edit_post)
-
-
-@main.route('/login', methods=["GET", "POST"])
-def login():
-    form = LoginForm()
-    return render_template('login.html', form=form)
 
 
 @main.route('/upload/', methods=['GET', 'POST', 'OPTIONS'])
