@@ -2,15 +2,22 @@
 {% import "_macros.html" as macros %}
 
 {% block content %}
+
 {{super()}}
+
 {% endblock %}
 
 {% block blog %}
 
+    {% if current_user.is_authenticated %}
+<div class="well">
+    <p>123</p>
+</div>
+{% endif %}
     {%for post in posts%}
 
-        <div class="page-content">
-            <strong><a  href={{url_for('main.article',id=post.id)}}>{{post.title}}</a></strong>
+        <div class="blog-post">
+            <h2 class="blog-post-title" ><a  href={{url_for('main.article',id=post.id)}}>{{post.title}}</a></h2>
             <div class="page-header">
             <p>{{ post.body|safe }}</p>
                 </div>
@@ -21,5 +28,6 @@
 <div class="pagination">
     {{ macros.pagination_widget(pagination, '.index') }}
 </div>
+
 {% endblock %}
 

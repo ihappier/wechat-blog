@@ -3,14 +3,15 @@ Routes and views for the flask application.
 """
 
 from datetime import datetime
-from flask import render_template, redirect, url_for, request, make_response, current_app
+from flask import render_template, redirect, url_for,\
+    request, make_response, current_app, abort
 from app.ueditor.uploader import Uploader
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from . import main
 from .. import db
 from ..models import User, Post
-from .forms import PostForm, LoginForm
+from .forms import PostForm
 
 import json
 import os
@@ -61,7 +62,8 @@ def post():
     form = PostForm()
     if form.validate_on_submit():
         body = request.form.get("editorValue")
-        article = Post(title=request.form.get("title"), body=body)
+        article = Post(title=request.form.get("title"), body=body,
+                       author_id=current_user._get_current_object().id)
         db.session.add(article)
         db.session.commit()
         return redirect(url_for('main.article', id=article.id))
@@ -72,7 +74,17 @@ def post():
 def article(id):
     """文章页面"""
     article = Post.query.get_or_404(id)
-    return render_template('article.html', article=article, title=article.title)
+    author = User.query.get_or_404(article.author_id)
+    return render_template('article.html', article=article, title=article.title, author=author)
+
+
+@main.route('/user/<username>')
+@login_required
+def user(username):
+    """用户界面"""
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = Post.query.filter_by(author_id=user.id)
+    return render_template('user.html', posts=posts, user=user)
 
 
 @main.route('/edit/<int:id>', methods=["GET", "POST"])
